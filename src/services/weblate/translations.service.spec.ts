@@ -95,4 +95,12 @@ describe('WeblateTranslationsService key lookup', () => {
 
     expect(unitsPartialUpdateMock).not.toHaveBeenCalled();
   });
+
+  it('wraps a failing lookup instead of leaking the raw error', async () => {
+    unitsListMock.mockRejectedValue(new Error('boom'));
+
+    await expect(
+      service.findTranslationsForKey('shoptet', '_A', 'cms-backend'),
+    ).rejects.toThrow(/Failed to find translations for key/);
+  });
 });
