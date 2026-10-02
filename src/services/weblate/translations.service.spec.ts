@@ -41,7 +41,7 @@ describe('WeblateTranslationsService key lookup', () => {
   it('stops at the context probe when it hits', async () => {
     unitsListMock.mockResolvedValueOnce(page([makeUnit(1, '_A')]));
 
-    const unit = await service.getTranslationByKey('shoptet', 'cms-backend', 'cs', '_A');
+    const unit = await service.getTranslationByKey('test-project', 'test-component', 'cs', '_A');
 
     expect(unit?.id).toBe(1);
     expect(unitsListMock).toHaveBeenCalledTimes(1);
@@ -54,8 +54,8 @@ describe('WeblateTranslationsService key lookup', () => {
       .mockResolvedValueOnce(page([makeUnit(1175891, 'He said "no"')]));
 
     const unit = await service.getTranslationByKey(
-      'shoptet',
-      'cms-backend',
+      'test-project',
+      'test-component',
       'cs',
       'He said "no"',
     );
@@ -72,8 +72,8 @@ describe('WeblateTranslationsService key lookup', () => {
       .mockResolvedValueOnce(page([]));
 
     const unit = await service.getTranslationByKey(
-      'shoptet',
-      'cms-backend',
+      'test-project',
+      'test-component',
       'cs',
       '_MISSING',
     );
@@ -90,7 +90,7 @@ describe('WeblateTranslationsService key lookup', () => {
       .mockResolvedValueOnce(page([makeUnit(1, '_DUP'), makeUnit(2, '_DUP')]));
 
     await expect(
-      service.writeTranslation('shoptet', 'cms-backend', 'de', '_DUP', 'Wert'),
+      service.writeTranslation('test-project', 'test-component', 'de', '_DUP', 'Wert'),
     ).rejects.toThrow(/ambiguous/);
 
     expect(unitsPartialUpdateMock).not.toHaveBeenCalled();
@@ -100,7 +100,7 @@ describe('WeblateTranslationsService key lookup', () => {
     unitsListMock.mockRejectedValue(new Error('boom'));
 
     await expect(
-      service.findTranslationsForKey('shoptet', '_A', 'cms-backend'),
+      service.findTranslationsForKey('test-project', '_A', 'test-component'),
     ).rejects.toThrow(/Failed to find translations for key/);
   });
 });
