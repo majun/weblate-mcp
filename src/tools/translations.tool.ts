@@ -466,7 +466,8 @@ export class WeblateTranslationsTool {
 **Status:** ${status}
 **Context:** ${translation.context || '(none)'}
 **Note:** ${translation.note || '(none)'}
-**ID:** ${translation.id}`;
+**ID:** ${translation.id}
+**URL:** ${translation.web_url}`;
   }
 
   private formatFilteredResults(results: Unit[], projectSlug: string, componentSlug: string, languageCode: string, searchQuery: string): string {
@@ -498,7 +499,8 @@ export class WeblateTranslationsTool {
 **Status:** ${status}
 **Location:** ${unit.location || '(none)'}
 **Note:** ${unit.note || '(none)'}
-**ID:** ${unit.id}`;
+**ID:** ${unit.id}
+**URL:** ${unit.web_url}`;
       })
       .join('\n\n');
 
