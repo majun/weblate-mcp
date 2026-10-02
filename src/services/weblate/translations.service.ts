@@ -329,14 +329,7 @@ export class WeblateTranslationsService {
     componentSlug?: string,
   ): Promise<Unit[]> {
     try {
-      const searchResult = await this.searchTranslations(
-        projectSlug,
-        componentSlug,
-        undefined,
-        `context:"${key}"`,
-      );
-
-      return searchResult.results;
+      return this.findUnitsByKey(projectSlug, componentSlug, undefined, key);
     } catch (error) {
       this.logger.error(
         `Failed to find translations for key "${key}" in project ${projectSlug}`,
