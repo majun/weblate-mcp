@@ -1,5 +1,5 @@
 import { WeblateTranslationsService } from './translations.service';
-import { unitsList } from '../../client';
+import { unitsList, unitsPartialUpdate } from '../../client';
 import type { Unit } from '../../client';
 import type { WeblateClientService } from '../weblate-client.service';
 
@@ -10,6 +10,9 @@ jest.mock('../../client', () => ({
 }));
 
 const unitsListMock = unitsList as jest.MockedFunction<typeof unitsList>;
+const unitsPartialUpdateMock = unitsPartialUpdate as jest.MockedFunction<
+  typeof unitsPartialUpdate
+>;
 
 const makeUnit = (id: number, source: string): Unit =>
   ({ id, source: [source], target: [''], context: '' }) as unknown as Unit;
@@ -79,5 +82,17 @@ describe('WeblateTranslationsService key lookup', () => {
     expect(unitsListMock).toHaveBeenCalledTimes(3);
     expect(queryOf(2)).toContain('context:"_MISSING"');
     expect(queryOf(2)).not.toContain('context:=');
+  });
+
+  it('refuses an ambiguous key instead of writing to the first match', async () => {
+    unitsListMock
+      .mockResolvedValueOnce(page([]))
+      .mockResolvedValueOnce(page([makeUnit(1, '_DUP'), makeUnit(2, '_DUP')]));
+
+    await expect(
+      service.writeTranslation('shoptet', 'cms-backend', 'de', '_DUP', 'Wert'),
+    ).rejects.toThrow(/ambiguous/);
+
+    expect(unitsPartialUpdateMock).not.toHaveBeenCalled();
   });
 });

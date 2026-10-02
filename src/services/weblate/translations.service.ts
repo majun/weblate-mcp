@@ -137,6 +137,13 @@ export class WeblateTranslationsService {
         key,
       );
 
+      if (units.length > 1) {
+        throw new Error(
+          `Key "${key}" is ambiguous in ${projectSlug}/${componentSlug}/${languageCode}: ` +
+            `${units.length} units match. Narrow the key, or update by unit id.`,
+        );
+      }
+
       return units[0] ?? null;
     } catch (error) {
       this.logger.error(`Failed to get translation for key ${key}`, error);
