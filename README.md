@@ -1,5 +1,13 @@
 # Weblate MCP Server
 
+> **Fork note.** This fork resolves translation keys by `source` when `msgctxt`
+> is empty — the shape produced by bilingual PO projects, where the key *is* the
+> msgid. Upstream resolves keys through `context` only, which makes
+> `getTranslationForKey`, `findTranslationsForKey`, `writeTranslation` and
+> `bulkWriteTranslations` fail on strings that exist. See
+> `src/services/weblate/translations.service.ts` (`KEY_LOOKUP_FIELDS`).
+> Not published to npm — run it with `npx -y github:majun/weblate-mcp`.
+
 A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that provides seamless integration with Weblate translation management platform. This server enables AI assistants to interact directly with your Weblate instance for comprehensive translation management.
 
 ## 🌟 Features
