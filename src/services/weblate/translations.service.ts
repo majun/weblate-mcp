@@ -83,6 +83,46 @@ export class WeblateTranslationsService {
     }
   }
 
+  /** Weblate query literal — escape backslashes and quotes. */
+  private quote(value: string): string {
+    return `"${value.replace(/[\\"]/g, '\\$&')}"`;
+  }
+
+  /**
+   * Probe order for resolving a key.
+   * Bilingual PO keeps the key in msgid (`source`), not in msgctxt (`context`).
+   * The exact operator `:=` is mandatory — a substring match on `source` can
+   * silently hit hundreds of units. The last probe is the original substring
+   * match on `context`, kept for backwards compatibility.
+   */
+  private static readonly KEY_LOOKUP_FIELDS = [
+    'context:=',
+    'source:=',
+    'context:',
+  ] as const;
+
+  private async findUnitsByKey(
+    projectSlug: string,
+    componentSlug: string | undefined,
+    languageCode: string | undefined,
+    key: string,
+  ): Promise<Unit[]> {
+    for (const prefix of WeblateTranslationsService.KEY_LOOKUP_FIELDS) {
+      const { results } = await this.searchTranslations(
+        projectSlug,
+        componentSlug,
+        languageCode,
+        `${prefix}${this.quote(key)}`,
+      );
+
+      if (results.length > 0) {
+        return results;
+      }
+    }
+
+    return [];
+  }
+
   async getTranslationByKey(
     projectSlug: string,
     componentSlug: string,
@@ -90,14 +130,14 @@ export class WeblateTranslationsService {
     key: string,
   ): Promise<Unit | null> {
     try {
-      const searchResult = await this.searchTranslations(
+      const units = await this.findUnitsByKey(
         projectSlug,
         componentSlug,
         languageCode,
-        `context:"${key}"`,
+        key,
       );
 
-      return searchResult.results.length > 0 ? searchResult.results[0] : null;
+      return units[0] ?? null;
     } catch (error) {
       this.logger.error(`Failed to get translation for key ${key}`, error);
       throw new Error(
